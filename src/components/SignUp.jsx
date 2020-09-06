@@ -44,13 +44,13 @@ const useStyles = makeStyles((theme) => ({
 
 const Signup = () => {
   const [err, setErr] = useState(false);
+  const [alert, setAlert] = useState(false);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [severity, setSeverity] = useState("success");
   const [showPassword, setShowPassword] = useState(false);
   const handleClickShowPassword = () => setShowPassword(!showPassword);
   const handleMouseDownPassword = () => setShowPassword(!showPassword);
-  //   let history = useHistory();
   const classes = useStyles();
 
   return (
@@ -61,33 +61,41 @@ const Signup = () => {
         email: "",
         password: "",
       }}
-      onSubmit={(values, { setSubmitting }) => {
+      onSubmit={async (values, { setSubmitting }) => {
         setTimeout(() => {
           console.log("Signing up", values);
           setLoading(true);
-
-          axios
-            .post(`https://api.raisely.com/v3/signup`, {
-              campaignUuid: "46aa3270-d2ee-11ea-a9f0-e9a68ccff42a",
-              data: {
-                firstName: values.firstName,
-                lastName: values.lastName,
-                email: values.email,
-                password: values.password,
-              },
-            })
+          let x = axios.post(`https://api.raisely.com/v3/check-user`, {
+            campaignUuid: "46aa3270-d2ee-11ea-a9f0-e9a68ccff42a",
+            data: {
+              email: values.email,
+            },
+          });
+          let y = axios.post(`https://api.raisely.com/v3/signup`, {
+            campaignUuid: "46aa3270-d2ee-11ea-a9f0-e9a68ccff42a",
+            data: {
+              firstName: values.firstName,
+              lastName: values.lastName,
+              email: values.email,
+              password: values.password,
+            },
+          });
+          Promise.all([x, y])
             .then((res) => {
-              console.log(res.data.data.message);
-              setMessage(err);
+              console.log(res);
+              setMessage("OK");
               setLoading(false);
+              setAlert(true);
             })
             .catch((err) => {
               console.log(err);
+              setLoading(false);
               setMessage("EXISTS");
               setSeverity("error");
+              setAlert(true);
               setErr(true);
-              setLoading(false);
             });
+
           setSubmitting(false);
         }, 200);
       }}
@@ -120,7 +128,11 @@ const Signup = () => {
             <div style={{ marginBottom: "20vh" }}></div>
             <Container component={Card} maxWidth="sm" elevation={7}>
               <CssBaseline />
-              {err ? <Alert severity={severity}>{message}</Alert> : <div></div>}
+              {alert ? (
+                <Alert severity={severity}>{message}</Alert>
+              ) : (
+                <div></div>
+              )}
               <div className={classes.paper}>
                 <div className={classes.display}>
                   <Typography
