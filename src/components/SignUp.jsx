@@ -125,7 +125,7 @@ const Signup = () => {
         } = props;
         return (
           <>
-            <div style={{ marginBottom: "20vh" }}></div>
+            <div style={{ marginBottom: "10vh" }}></div>
             <Container component={Card} maxWidth="sm" elevation={7}>
               <CssBaseline />
               {alert ? (
